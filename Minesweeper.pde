@@ -6,8 +6,9 @@ private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> bombs = new ArrayList <MSButton>(); //ArrayList of just the minesweeper buttons that are mined
 public final static int NUM_ROWS = 20;
 public final static int NUM_COLS = 20;
-public final static int BOMB_NUM = 50;
+public final static int BOMB_NUM = 5;
 private int markedBombs = 0;
+private boolean gameOver = false;
 
 public void setup ()
 {
@@ -46,9 +47,12 @@ public void setBombs()
 
 public void draw ()
 {
-    background( 0 );
-    if(isWon())
-        displayWinningMessage();
+    if(gameOver == false)
+    {
+        background( 0 );
+        if(isWon())
+            displayWinningMessage();
+    }
 }
 public boolean isWon()
 {
@@ -78,6 +82,7 @@ public void displayLosingMessage()
     buttons[8][10].setLabel("E");
     buttons[8][11].setLabel("R");
     buttons[8][12].setLabel("!");
+    gameOver = true;
 }
 public void displayWinningMessage()
 {
@@ -89,6 +94,7 @@ public void displayWinningMessage()
     buttons[8][11].setLabel("R");
     buttons[8][12].setLabel("!");
     buttons[8][13].setLabel("!");
+    gameOver = true;
 }
 
 public class MSButton
@@ -125,50 +131,53 @@ public class MSButton
     }
     public void mousePressed () 
     {
-
-     if(clicked == false)
-     {
-        clicked = true;
-
-        if(mouseButton == LEFT)
+        if(gameOver == false)
         {
-            if(bombs.contains(this))
+
+           if(clicked == false)
+           {
+            clicked = true;
+
+            if(mouseButton == LEFT)
             {
-                displayLosingMessage();
-            }
-            else if(countBombs(r,c) > 0)
-            {
-                if(label == "")
+                if(bombs.contains(this))
                 {
-                    label = label + (countBombs(r,c));
-                    println("label: "+label);
+                    displayLosingMessage();
                 }
-            }
-            else 
-            {
-                for(int i = -1; i < 2; i++)
+                else if(countBombs(r,c) > 0)
                 {
-                    for(int m = -1; m < 2; m++)
+                    if(label == "")
                     {
-                        if(isValid(r+i,c+m))
+                        label = label + (countBombs(r,c));
+                        println("label: "+label);
+                    }
+                }
+                else 
+                {
+                    for(int i = -1; i < 2; i++)
+                    {
+                        for(int m = -1; m < 2; m++)
                         {
-                            if(buttons[r+i][c+m].isClicked() == false)
+                            if(isValid(r+i,c+m))
                             {
-                                buttons[r+i][c+m].mousePressed();
+                                if(buttons[r+i][c+m].isClicked() == false)
+                                {
+                                    buttons[r+i][c+m].mousePressed();
+                                }
                             }
                         }
                     }
+
+
                 }
-
-
             }
         }
-    }
-    if(mouseButton == RIGHT)
-    {
-        marked = !marked;
-        if(marked){markedBombs++;}
-        else{markedBombs--; clicked = false;}
+        if(mouseButton == RIGHT)
+        {
+            marked = !marked;
+            if(marked){markedBombs++;}
+            else{markedBombs--; clicked = false;}
+        }
     }
 }
 
@@ -178,8 +187,8 @@ public void draw ()
     if (marked)
         fill(0);
     else if( clicked && bombs.contains(this) ) 
-     fill(255,0,0);
- else if(clicked)
+       fill(255,0,0);
+   else if(clicked)
     fill( 200 );
 else 
     fill( 100 );
